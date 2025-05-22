@@ -17,9 +17,18 @@ const TransferList = ({ initialItems }) => {
       prev.includes(id) ? prev.fliter((item) => item !== id) : [...prev.id];
     });
   };
-  const transferToLeft=()=>{
-    
-  }
+  const transferToLeft = () => {
+    const newLeftItems = leftItems.fliter((item) =>
+      selectedLeft.includes(item.id)
+    );
+    const newRightItems = [
+      ...rightItems,
+      ...leftItems.fliter((item) => selectedLeft.includes(item.id)),
+    ];
+    selectedLeft(newLeftItems);
+    setRightItems(newRightItems);
+    setSelectLeftItems([]);
+  };
   return (
     <div>
       <Container
