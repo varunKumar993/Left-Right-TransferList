@@ -3,50 +3,61 @@ import Container from "./Container";
 import Controls from "./Controls";
 
 const TransferList = ({ initialItems }) => {
-  const [rightItems, setRightItems] = useState(initialItems);
+  const [rightItems, setRightItems] = useState([]);
   const [leftItems, setLeftItems] = useState(initialItems);
   const [selectedLeft, setSelectLeftItems] = useState([]);
   const [selectedRight, setSelectRightItems] = useState([]);
+
   const handleSelectRight = (id) => {
-    selectedRight((prev) => {
-      prev.includes(id) ? prev.fliter((item) => item !== id) : [...prev.id];
-    });
-  };
-  const handleLeftRight = (id) => {
-    selectedLeft((prev) => {
-      prev.includes(id) ? prev.fliter((item) => item !== id) : [...prev.id];
-    });
-  };
-  const transferToLeft = () => {
-    const newLeftItems = leftItems.fliter((item) =>
-      selectedLeft.includes(item.id)
+    setSelectRightItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
-    const newRightItems = [
-      ...rightItems,
-      ...leftItems.fliter((item) => selectedLeft.includes(item.id)),
-    ];
-    selectedLeft(newLeftItems);
-    setRightItems(newRightItems);
+  };
+
+  const handleSelectLeft = (id) => {
+    setSelectLeftItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const transferToRight = () => {
+    const selected = leftItems.filter((item) => selectedLeft.includes(item.id));
+    setRightItems((prev) => [...prev, ...selected]);
+    setLeftItems((prev) =>
+      prev.filter((item) => !selectedLeft.includes(item.id))
+    );
     setSelectLeftItems([]);
   };
+
+  const transferToLeft = () => {
+    const selected = rightItems.filter((item) =>
+      selectedRight.includes(item.id)
+    );
+    setLeftItems((prev) => [...prev, ...selected]);
+    setRightItems((prev) =>
+      prev.filter((item) => !selectedRight.includes(item.id))
+    );
+    setSelectRightItems([]);
+  };
+
   return (
-    <div>
-      <Container
-        items={rightItems}
-        selectedItems={selectedLeft}
-        onSelect={handleSelectRight}
-      ></Container>
-      <Controls
-        transferToRight={transferToRight}
-        transferToLeft={transferToLeft}
-        disabled={!selectedRight.length}
-        disabled={!selectedLeft.length}
-      ></Controls>
+    <div className="flex gap-4">
       <Container
         items={leftItems}
         selectedItems={selectedLeft}
-        onSelect={handleLeftRight}
-      ></Container>
+        onSelect={handleSelectLeft}
+      />
+      <Controls
+        transferToRight={transferToRight}
+        transferToLeft={transferToLeft}
+        disableLeft={selectedLeft.length === 0}
+        disableRight={selectedRight.length === 0}
+      />
+      <Container
+        items={rightItems}
+        selectedItems={selectedRight}
+        onSelect={handleSelectRight}
+      />
     </div>
   );
 };
